@@ -1,6 +1,7 @@
 package com.example.mydictionaria;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
@@ -38,8 +39,21 @@ public class WordlistActivity extends AppCompatActivity {
     private View.OnClickListener listener;
     private View.OnClickListener deletelistener;
     private View.OnClickListener descriptionlistener;
-
+    private int currentNightMode;
+    private boolean isNight;
     void getWords() throws JSONException {
+
+        currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
+        switch (currentNightMode) {
+            case Configuration.UI_MODE_NIGHT_NO:
+                isNight = false;
+                break;
+            case Configuration.UI_MODE_NIGHT_YES:
+                isNight = true;
+                break;
+        }
+
 
         JSONArray names = jsonfiledata.names();
         if(names == null) return;
@@ -59,7 +73,14 @@ public class WordlistActivity extends AppCompatActivity {
             String s = ar.get(i);
             LinearLayout lhl = new LinearLayout(WordlistActivity.this);
             lhl.setOrientation(LinearLayout.HORIZONTAL);
-            lhl.setBackgroundResource(R.drawable.card_drawable);
+            if(!isNight)
+            {
+                lhl.setBackgroundResource(R.drawable.card_drawable);
+            }
+            else
+            {
+                lhl.setBackgroundResource(R.drawable.card_drawable_night);
+            }
 
             Button tv = new Button(WordlistActivity.this);
             tv.setText(s);
