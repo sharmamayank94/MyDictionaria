@@ -33,98 +33,46 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity {
-    public static final String FILE_NAME = "word-data.txt";
-    private static final int READ_EXTERNAL_STORAGE= 23;
-    private File file;
-    private FileReader fileReader;
-    private FileWriter fileWriter;
-    private BufferedReader bufferedReader;
-    private BufferedWriter bufferedWriter;
-    public static JSONObject jsonfiledata;
+
+
     private View.OnClickListener listener;
 
 
-    private void initJson()
-    {
-        try{
-
-            StringBuffer str = new StringBuffer();
-            fileReader = new FileReader(file.getAbsolutePath());
-            bufferedReader = new BufferedReader(fileReader);
-
-            String response = "";
-            String line = "";
-
-            while((line = bufferedReader.readLine()) != null)
-            {
-                str.append(line);
-            }
-            response = str.toString();
-
-            bufferedReader.close();
-            jsonfiledata = new JSONObject(response);
-        } catch(IOException | JSONException e)
-        {
-            Toast.makeText(MainActivity.this, e.toString() , Toast.LENGTH_LONG).show();
-            e.printStackTrace();
-        }
-    }
-    private boolean isWordExist(String word)
-    {
-        return jsonfiledata.has(word);
-    }
-
-    private void saveWord(String word, String meaning)
-    {
-        try{
-
-            //JSONObject jsonmeaning = new JSONObject(meaning);
-            jsonfiledata.put(word, meaning);
-
-            fileWriter = new FileWriter(file.getAbsolutePath());
-            bufferedWriter = new BufferedWriter(fileWriter);
-            bufferedWriter.write(jsonfiledata.toString());
-            bufferedWriter.close();
-
-        }catch(JSONException | IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+//        try{
+//
+//            File folder = new File(this.getFilesDir(), "word-data.txt");
+//            folder.delete();
+//            folder.createNewFile();
+//            FileWriter fw = new FileWriter(folder);
+//            BufferedWriter bw = new BufferedWriter(fw);
+//            bw.write("\n" +
+//                    "{\n" +
+//                    "\twords: {\n" +
+//                    "\t\tperil:[\"\"],meager:[\"\"],convulsive:[\"\"],prolonged:[\"\"],simile:[\"\"],fatuous:[\"\"],incorrigible:[\"\"],stifling:[\"\"],vociferous:[\"\"],veneration:[\"\"],erudite:[\"\"],persiflage:[\"\"],petulant:[\"\"],yearning:[\"\"],estrangement:[\"\"],avow:[\"\"],Badegast:[\"\"],suprapersonal:[\"\"],servitors:[\"\"],there:[\"\"],shinichi:[\"\"],ignorant:[\"\"],melancholy:[\"\"],unsullied:[\"\"],horrendous:[\"\"],astray:[\"\"],instigator:[\"\"],seared:[\"\"],contrition:[\"\"],conan:[\"\"]\n" +
+//                    "\t},\n" +
+//                    "\tpractice: [\"peril\",\"meager\",\"convulsive\",\"prolonged\",\"simile\",\"fatuous\",\"incorrigible\",\"stifling\",\"vociferous\",\"veneration\",\"erudite\",\"persiflage\",\"petulant\",\"yearning\",\"estrangement\",\"avow\",\"Badegast\",\"suprapersonal\",\"servitors\",\"there\",\"shinichi\",\"ignorant\",\"melancholy\",\"unsullied\",\"horrendous\",\"astray\",\"instigator\",\"seared\",\"contrition\",\"conan\"],\n" +
+//                    "\tquotes: []\n" +
+//                    "}\n" +
+//                    "\n");
+//            bw.close();
+//        }catch(IOException e)
+//        {
+//            e.printStackTrace();
+//        }
 
-
-        fileReader = null;
-        fileWriter = null;
-        bufferedReader = null;
-        bufferedWriter = null;
 
         Button addword = findViewById(R.id.addwordbutton);
         Button getwordbutton = findViewById(R.id.mywordlist);
-        file = new File(this.getFilesDir(), FILE_NAME);
 
 
-
-        if(!file.exists())
-        {
-            try{
-                file.createNewFile();
-                fileWriter = new FileWriter(file.getAbsoluteFile());
-                bufferedWriter = new BufferedWriter(fileWriter);
-                bufferedWriter.write("{}");
-                bufferedWriter.close();
-            } catch(IOException e){
-                System.out.println("This is herre9fjowf");
-                e.printStackTrace();
-            }
-        }
-        initJson();
         addword.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -132,10 +80,27 @@ public class MainActivity extends AppCompatActivity {
                 TextInputEditText word = findViewById(R.id.addwordtext);
                 TextInputEditText meaning = findViewById(R.id.addmeaningtext);
 
-                boolean isword = isWordExist(word.getText().toString());
-                if(isword) return;
+                File folder = MainActivity.this.getFilesDir();
+                DataAccess da = new DataAccess(folder);
 
-                saveWord(word.getText().toString(), meaning.getText().toString());
+                boolean isword = da.containsWord(word.getText().toString());
+
+                if(isword){
+                    Toast.makeText(MainActivity.this, "Word already in the list", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                boolean wordadded = da.addWord(word.getText().toString(), meaning.getText().toString());
+                if(wordadded)
+                {
+                    word.setText("");
+                    meaning.setText("");
+                    Toast.makeText(MainActivity.this, "Word Added", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    Toast.makeText(MainActivity.this, "Some error", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 

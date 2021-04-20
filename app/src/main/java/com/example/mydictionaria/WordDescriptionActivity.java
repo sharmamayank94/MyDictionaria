@@ -3,6 +3,7 @@ package com.example.mydictionaria;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,11 +19,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+
 public class WordDescriptionActivity extends AppCompatActivity {
     private int definitions_count = 0;
     private int current = 0;
     private String word;
-    private JSONArray meanings;
+    private JSONArray meanings = null;
 
     private void showDict() throws JSONException {
         JSONObject definitionandexampleandsynonym = (JSONObject) ((JSONArray)((JSONObject) meanings.get(current)).get("definitions")).get(0);
@@ -46,8 +49,35 @@ public class WordDescriptionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.word_description);
         Intent intent = getIntent();
+
+
+        String action = intent.getAction();
+        String type = intent.getType();
+
+
+        if(action.equals(Intent.ACTION_SEND) && "text/plain".equals(intent.getType()))
+        {
+            File folder = this.getFilesDir();
+            DataAccess da = new DataAccess(folder);
+            if(!da.containsWord(word))
+            {
+                String meaning = "";
+                word = intent.getStringExtra(Intent.EXTRA_TEXT);
+                boolean res = da.addWord(word, meaning);
+                if(res)
+                {
+                    Toast.makeText(WordDescriptionActivity.this, "Word added", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+        }
+        else{
+            word = intent.getStringExtra("word");
+        }
+
+
         TextView tv = findViewById(R.id.worddescriptionhead);
-        word = intent.getStringExtra("word");
+
         tv.setText(word);
 
         RequestQueue queue = Volley.newRequestQueue(this);
@@ -58,7 +88,7 @@ public class WordDescriptionActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        // Display the first 500 characters of the response string.
+
                         try {
                             JSONArray ja = new JSONArray(response);
                             meanings = (JSONArray) ja.getJSONObject(0).get("meanings");
@@ -84,7 +114,8 @@ public class WordDescriptionActivity extends AppCompatActivity {
 
 
 
-//        tv.setText(intent.getStringExtra("word"));
+
+
 
 
     }

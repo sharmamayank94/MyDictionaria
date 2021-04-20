@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.LightingColorFilter;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentContainer;
@@ -35,13 +37,12 @@ import java.util.Collections;
 
 public class WordlistActivity extends AppCompatActivity {
     public static JSONObject jsonfiledata;
-    private File file;
     private View.OnClickListener listener;
     private View.OnClickListener deletelistener;
     private View.OnClickListener descriptionlistener;
     private int currentNightMode;
     private boolean isNight;
-    void getWords() throws JSONException {
+    void getWords() {
 
         currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
 
@@ -54,19 +55,14 @@ public class WordlistActivity extends AppCompatActivity {
                 break;
         }
 
+        File folder = this.getFilesDir();
+        DataAccess da = new DataAccess(folder);
 
-        JSONArray names = jsonfiledata.names();
-        if(names == null) return;
-
-
-        ArrayList<String> ar = new ArrayList<>();
-        LinearLayout ln = findViewById(R.id.linearwordList);
-
-        for(int i = 0; i < names.length(); i++)
-        {
-            ar.add(names.getString(i));
-        }
+        ArrayList<String> ar = da.getWords();
+        if(ar.isEmpty()) return;
         Collections.sort(ar);
+
+        LinearLayout ln = findViewById(R.id.linearwordList);
 
         for(int i = 0; i <ar.size();  i++)
         {
@@ -125,40 +121,28 @@ public class WordlistActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Button b = (Button) v;
-                try {
-                    Toast.makeText(WordlistActivity.this, jsonfiledata.get(b.getText().toString()).toString(), Toast.LENGTH_LONG).show();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+
+                Toast.makeText(WordlistActivity.this, b.getText().toString(), Toast.LENGTH_LONG).show();
+
             }
         };
 
         deletelistener = new View.OnClickListener(){
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View v) {
-                Button b = (Button)v;
+
 
                 LinearLayout delete = (LinearLayout)v.getParent();
                 TextView data = (TextView)delete.getChildAt(0);
 
-                jsonfiledata.remove(data.getText().toString());
-
-
-                try {
-                    FileWriter fl = new FileWriter(file);
-                    BufferedWriter bw = new BufferedWriter(fl);
-
-                    bw.write(jsonfiledata.toString());
-                    bw.close();
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                File folder = WordlistActivity.this.getFilesDir();
+                DataAccess da = new DataAccess(folder);
+                da.deleteWord(data.getText().toString());
 
 
                 ViewParent vpc = delete.getParent();
                 ((ViewGroup)vpc).removeView(delete);
-
 
             }
         };
@@ -171,20 +155,15 @@ public class WordlistActivity extends AppCompatActivity {
                 LinearLayout vp = (LinearLayout)des.getParent();
                 TextView tv = (TextView) vp.getChildAt(0);
 
-
                 Intent in = new Intent(WordlistActivity.this, WordDescriptionActivity.class);
                 in.putExtra("word", tv.getText().toString());
+                in.setType("some");
+                in.setAction("some");
                 startActivity(in);
             }
         };
 
-        jsonfiledata = MainActivity.jsonfiledata;
 
-        file = new File(this.getFilesDir(), MainActivity.FILE_NAME);
-        try {
-            getWords();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        getWords();
     }
 }
