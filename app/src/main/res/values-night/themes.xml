@@ -2,9 +2,9 @@
     <!-- Base application theme. -->
     <style name="Theme.MyDictionaria" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_200</item>
+        <item name="colorPrimary">#0042A5</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorOnPrimary">#E8E8E8</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_200</item>
@@ -13,8 +13,8 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
 
-       <item name = "backgroundColor">@color/black</item>-->
-       <item name = "backgroundTint">@color/black</item>-->
+       <item name = "backgroundColor">#171717</item>
+       <item name = "backgroundTint">#171717</item>
 
     </style>
 </resources>

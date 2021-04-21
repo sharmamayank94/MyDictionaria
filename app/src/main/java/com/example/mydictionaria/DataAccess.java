@@ -1,11 +1,19 @@
 package com.example.mydictionaria;
 
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,6 +32,7 @@ public class DataAccess {
     private static JSONObject jsondata;
     private static File file;
     public static final String FILE_NAME = "word-data.txt";
+    private Word currentWord = null;
 
     private void createFile()
     {
@@ -79,6 +88,54 @@ public class DataAccess {
         }
     }
 
+    public void getWordAPI(Context app, String word, final NetworkController callback)
+    {
+        RequestQueue queue = Volley.newRequestQueue(app);
+        String url = "https://api.dictionaryapi.dev/api/v2/entries/en_US/"+word;
+
+// Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try{
+                            //Parsing data received into Word class object if data is not received word class object sends back null
+                            JSONArray jsonword = new JSONArray(response);
+                            JSONArray meanings = (JSONArray) ((JSONObject)jsonword.get(0)).get("meanings");
+                            JSONObject definition_object =(JSONObject) ((JSONArray)((JSONObject)meanings.get(0)).get("definitions")).get(0);
+
+                            String definition = definition_object.get("definition").toString();
+                            String usage = definition_object.get("example").toString();
+                            ArrayList<String> synonyms = new ArrayList<>();
+                            if(definition_object.has("synonyms")){
+                                JSONArray synonyms_array = (JSONArray) definition_object.get("synonyms");
+                                for(int i = 0; i < synonyms_array.length(); i++)
+                                {
+                                    synonyms.add(synonyms_array.get(i).toString());
+                                }
+                            }
+
+                            String word = ((JSONObject)jsonword.get(0)).getString("word");
+
+                            currentWord = new Word(word, definition, synonyms, usage);
+                            callback.onSuccess(currentWord);
+
+                        }catch(JSONException e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                callback.onSuccess(null);
+            }
+        });
+
+
+        queue.add(stringRequest);
+    }
+
     public ArrayList<String> getWords(){
         ArrayList<String> result = new ArrayList<>();
         try{
@@ -126,18 +183,11 @@ public class DataAccess {
             ja.put(meaning);
             words_object.put(word, ja);
 
-//            JSONObject obj = new JSONObject();
-//            obj.put("words", words_object);
-//            obj.put("practice", practice);
-//            obj.put("quotes", quotes);
 
-            FileWriter fr = new FileWriter(file);
-            BufferedWriter bw = new BufferedWriter(fr);
-            bw.write(jsondata.toString());
-            bw.close();
+            updateFile();
             return true;
         }
-        catch(JSONException | IOException e)
+        catch(JSONException e)
         {
             e.printStackTrace();
             return false;
@@ -166,12 +216,65 @@ public class DataAccess {
                 ja.remove(ind);
             }
 
+            updateFile();
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    void initPractice()
+    {
+        try{
+            JSONObject jo = (JSONObject)jsondata.get("words");
+            JSONArray practice =(JSONArray) jsondata.get("practice");
+            JSONArray temp = jo.names();
+            if(temp == null) return;
+            for(int i = 0; i < temp.length(); i++)
+            {
+                practice.put(temp.get(i));
+            }
+            updateFile();
+        }catch(JSONException e)
+        {
+            e.printStackTrace();
+        }
+
+    }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public String getPracticeWord() {
+        try {
+            JSONArray practice_words = (JSONArray) jsondata.get("practice");
+            if(practice_words.length() == 0)
+            {
+                initPractice();
+                practice_words = (JSONArray) jsondata.get("practice");
+                if(practice_words.length() == 0){
+                    return "";
+                }
+            }
+
+            String word = practice_words.get(0).toString();
+            practice_words.remove(0);
+
+            updateFile();
+
+            return word;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private void updateFile() {
+        try{
             FileWriter fw = new FileWriter(file);
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(jsondata.toString());
             bw.close();
-
-        } catch (IOException | JSONException e) {
+        }catch(IOException e)
+        {
             e.printStackTrace();
         }
 

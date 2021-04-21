@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
         Button addword = findViewById(R.id.addwordbutton);
         Button getwordbutton = findViewById(R.id.mywordlist);
-
+        Button practice = findViewById(R.id.practice);
 
         addword.setOnClickListener(new View.OnClickListener() {
 
@@ -109,6 +109,14 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                     Intent intent = new Intent(MainActivity.this, WordlistActivity.class);
                     startActivity(intent);
+            }
+        });
+
+        practice.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent practice_intent = new Intent(MainActivity.this, PracticeActivity.class);
+                startActivity(practice_intent);
             }
         });
 
