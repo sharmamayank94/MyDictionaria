@@ -1,7 +1,9 @@
 package com.example.mydictionaria;
 
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -22,6 +24,8 @@ public class PracticeActivity extends AppCompatActivity {
     private String question;
     private String answer;
     private DataAccess dataAccess;
+    private View.OnClickListener next;
+    private View.OnClickListener submit;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void askQuestion(int attempt ){
@@ -50,6 +54,9 @@ public class PracticeActivity extends AppCompatActivity {
                     return;
                 }
                 question_view.setText(word.meaning);
+                question = word.meaning;
+                answer = word.word;
+
             }
         });
 
@@ -68,7 +75,43 @@ public class PracticeActivity extends AppCompatActivity {
         answer_view = findViewById(R.id.practice_answer);
         submit_next_view = findViewById(R.id.practice_submit);
 
+
+        submit = new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                if(answer_view.getText().toString().equalsIgnoreCase(answer))
+                {
+                    TextView result = findViewById(R.id.practice_result);
+                    result.setTextColor(Color.parseColor("#55FF88"));
+                    result.setText("Right answer");
+                }
+                else
+                {
+                    TextView result = findViewById(R.id.practice_result);
+                    result.setTextColor(Color.parseColor("#ff55bb"));
+                    result.setText("Wrong answer!\nCorrect answer is: " + answer);
+                }
+                answer_view.setText("");
+                submit_next_view.setText("Next");
+                submit_next_view.setOnClickListener(next);
+
+            }
+        };
+
+        next = new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                askQuestion(0);
+                submit_next_view.setText("Submit");
+                submit_next_view.setOnClickListener(submit);
+                TextView result = findViewById(R.id.practice_result);
+                result.setText("");
+            }
+        };
+        submit_next_view.setOnClickListener(submit);
         askQuestion(0);
+
+
 
     }
 }

@@ -33,15 +33,17 @@
 
             <EditText
                 android:id="@+id/practice_answer"
+                style="@style/Widget.AppCompat.AutoCompleteTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="50dp"
 
+                android:layout_marginTop="50dp"
                 android:ems="10"
                 android:inputType="text"
-                app:layout_constraintTop_toBottomOf="@id/practice_sentence"
+                android:padding="4dp"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"/>
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/practice_sentence" />
 
             <Button
                 android:id="@+id/practice_submit"
@@ -54,6 +56,17 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/practice_answer" />
+
+            <TextView
+                android:id="@+id/practice_result"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginTop="50dp"
+                android:textSize="18dp"
+
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/practice_submit" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

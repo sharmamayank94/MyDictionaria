@@ -13,8 +13,8 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
 
-       <item name = "backgroundColor">#171717</item>
-       <item name = "backgroundTint">#171717</item>
+
+        <item name = "backgroundTint">#F19E9E</item>
 
     </style>
 </resources>
