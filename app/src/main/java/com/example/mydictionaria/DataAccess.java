@@ -105,7 +105,13 @@ public class DataAccess {
                             JSONObject definition_object =(JSONObject) ((JSONArray)((JSONObject)meanings.get(0)).get("definitions")).get(0);
 
                             String definition = definition_object.get("definition").toString();
-                            String usage = definition_object.get("example").toString();
+                            String usage = "";
+                            try{
+                                 usage = definition_object.get("example").toString();
+                            }catch(JSONException jo)
+                            {
+
+                            }
                             ArrayList<String> synonyms = new ArrayList<>();
                             if(definition_object.has("synonyms")){
                                 JSONArray synonyms_array = (JSONArray) definition_object.get("synonyms");
