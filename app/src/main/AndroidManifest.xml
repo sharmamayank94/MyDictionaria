@@ -35,6 +35,9 @@
         <activity android:name = ".PracticeActivity">
 
         </activity>
+
+        <receiver android:name=".AlarmReceiver" >
+        </receiver>
     </application>
 
 </manifest>
