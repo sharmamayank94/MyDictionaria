@@ -97,6 +97,27 @@
                     app:elevation="10dp" />
 
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id = "@+id/addquote"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_marginLeft="40dp"
+                    android:text="Add quote"/>
+
+                <Button
+                    android:id = "@+id/myquotelist"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_marginLeft="40dp"
+                    android:text = "My quotes"/>
+
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 

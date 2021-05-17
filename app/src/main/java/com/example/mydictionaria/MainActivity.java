@@ -103,6 +103,8 @@ public class MainActivity extends AppCompatActivity {
         Button addword = findViewById(R.id.addwordbutton);
         Button getwordbutton = findViewById(R.id.mywordlist);
         Button practice = findViewById(R.id.practice);
+        Button addquote = findViewById(R.id.addquote);
+        Button quoteListButton = findViewById(R.id.myquotelist);
 
         addword.setOnClickListener(new View.OnClickListener() {
 
@@ -151,5 +153,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        addquote.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v)
+            {
+                Intent add_quote_intent = new Intent(MainActivity.this, AddQuote.class);
+                startActivity(add_quote_intent);
+            }
+        });
+
+        quoteListButton.setOnClickListener(new View.OnClickListener(){
+           @Override
+           public void onClick(View v)
+           {
+               Intent quote_list_intent = new Intent(MainActivity.this, QuoteList.class);
+               startActivity(quote_list_intent);
+           }
+        });
     }
 }
